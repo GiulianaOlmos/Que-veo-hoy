@@ -62,8 +62,30 @@ function buscarPeliculas (req, res) {
         });
     }
 
+    
+function obtenerInfoPelicula(req, res) {
+    var id = req.params.id;
+    //Uso el JOIN para poder unir todas las tavlas en una conectandolas por los id creados en el script-inicial
+    var sql = "SELECT * FROM pelicula JOIN genero ON pelicula.genero_id = genero.id JOIN actor_pelicula ON pelicula.id = actor_pelicula.pelicula_id JOIN actor ON actor_pelicula.actor_id = actor.id WHERE pelicula.id = '" + id + "'";
+        
+    connection.query(sql, function(error, resultado){
+        if (error) {
+            console.log('Hubo un error en la consulta', error.message);
+            return res.status(404).send('Hubo un error en la consulta');
+        }
+        var response = {
+            'pelicula': resultado[0],
+            'actores' : resultado,
+            'genero' : resultado[0]
+        };
+        res.send(JSON.stringify(response));
+    });
+}
+    
+
 module.exports = {
     buscarPeliculas: buscarPeliculas,
     buscarGenero: buscarGenero,
+    obtenerInfoPelicula: obtenerInfoPelicula,
 };
 
