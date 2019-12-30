@@ -13,3 +13,13 @@ CREATE TABLE pelicula (
   trama varchar(700),
   PRIMARY KEY(id)
 );
+
+CREATE TABLE genero (
+  id int auto_increment,
+  nombre varchar(30),
+  PRIMARY KEY(id)
+);
+
+ALTER TABLE pelicula ADD COLUMN genero_id int;
+
+ALTER TABLE pelicula ADD FOREIGN KEY (genero_id) REFERENCES genero(id);

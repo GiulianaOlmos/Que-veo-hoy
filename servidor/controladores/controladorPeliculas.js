@@ -1,19 +1,33 @@
 var connection = require('../lib/conexionbd');
 
 function buscarPeliculas (req, res) {
-    let sql = 'SELECT * FROM pelicula';
-    let sql_;
+    let sql = 'SELECT * FROM pelicula WHERE true';
     let titulo = req.query.titulo;
     let anio = req.query.anio;
     let genero = req.query.genero;
     let orden =req.query.columna_orden; 
     let tipoDeOrden = req.query.tipo_orden;
-    let pagina = req.query.pagina;
     let cantidad = req.query.cantidad;
+    let pagina = (req.query.pagina -1)*cantidad;
+
     let total;
       
-      
-    //TOTAL DE PELÍCULAS
+    //FILTROS
+    if(titulo){
+        sql += ' AND titulo LIKE "%'+ titulo +'%"';
+    }
+    if(anio){
+        sql += ' AND anio =' + anio;
+    }  
+    if(genero){
+        sql += ' AND genero_id =' + genero;
+    }
+
+    //ORDEN Y PAGINACION
+    sql += " ORDER BY " + orden +" "+ tipoDeOrden + " LIMIT "+ pagina + ","+ cantidad;
+
+
+    //TODAS LAS PELICULAS
     connection.query(sql, function(error, resultado) {
         if (error) {
             console.log("Hubo un error en la consulta", error.message);
@@ -32,7 +46,24 @@ function buscarPeliculas (req, res) {
   
     };
   
+    function buscarGenero(req, res){
+        var sql = "SELECT * FROM genero";
+        
+        connection.query(sql, function(error, resultado){
+            if (error) {
+              console.log('Hubo un error en la consulta', error.message);
+              return res.status(404).send('Hubo un error en la consulta');
+            }
+            var response = {
+              'generos': resultado
+            };
+    
+            res.send(JSON.stringify(response));
+        });
+    }
 
 module.exports = {
     buscarPeliculas: buscarPeliculas,
+    buscarGenero: buscarGenero,
 };
+
