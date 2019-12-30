@@ -81,11 +81,46 @@ function obtenerInfoPelicula(req, res) {
         res.send(JSON.stringify(response));
     });
 }
+
+function buscarPeliRecomendada(req, res){
+    var genero = req.query.genero;
+    var anioInicio = req.query.anio_inicio;
+    var anioFin = req.query.anio_fin;
+    var puntuacion = req.query.puntuacion;
+    var sql = 'SELECT * FROM pelicula p INNER JOIN genero g ON p.genero_id = g.id WHERE true';
+
+    if(genero){
+        sql += ' AND g.nombre = ' + genero;
+    }
+    if(anioInicio){
+        sql += ' AND fecha_lanzamiento >= ' + anioInicio;
+    }
+    if(anioFin){
+        sql += ' AND fecha_lanzamiento <= ' + anioFin;
+    }
+    if(puntuacion){
+        sql += ' AND p.puntuacion >= ' + puntuacion;
+    }
+
+
+    connections.query(sql, function(error, resultado){
+      if (error) {
+        console.log('Hubo un error en la consulta', error.message);
+        return res.status(404).send('Hubo un error en la consulta');
+      }
+      var response = {
+        'peliculas': resultado
+      };
+      res.send(JSON.stringify(response));
+    });
+  }
+  
     
 
 module.exports = {
     buscarPeliculas: buscarPeliculas,
     buscarGenero: buscarGenero,
     obtenerInfoPelicula: obtenerInfoPelicula,
+    buscarPeliRecomendada: buscarPeliRecomendada,
 };
 
